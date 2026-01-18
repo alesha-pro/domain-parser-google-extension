@@ -13,7 +13,7 @@ A Chrome DevTools extension that captures and exports all domains a website conn
 ## Installation
 
 ### From Chrome Web Store
-1. Visit the [Chrome Web Store page](#)
+1. Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/domain-parser/gmnjnlccjbbmcehcobmjdlkliicahcdl)
 2. Click "Add to Chrome"
 
 ### Manual Installation (Developer Mode)
