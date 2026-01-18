@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Domain Parser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parse and export all domains from network requests to TXT file. Analyze which external services any website connects to.",
   "devtools_page": "devtools.html",
   "permissions": [],
