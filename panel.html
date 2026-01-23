@@ -127,6 +127,36 @@
       font-family: 'Monaco', 'Menlo', monospace;
       font-size: 13px;
       color: #a5d6a7;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .domain-item .domain {
+      flex: 1;
+    }
+
+    .domain-item .ip-info {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .domain-item .status-icon {
+      font-size: 14px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .domain-item .status-icon.resolved {
+      color: #4caf50;
+    }
+
+    .domain-item .status-icon.pending {
+      color: #ff9800;
+    }
+
+    .domain-item .status-icon.failed {
+      color: #f44336;
     }
 
     .empty-state {
@@ -145,6 +175,33 @@
       color: #dc3545;
       font-size: 12px;
       font-weight: 600;
+    }
+
+    .resolve-progress {
+      background: #2d2d44;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #1a1a2e;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s;
+      width: 0%;
     }
 
     .recording-dot {
@@ -172,13 +229,23 @@
     <div class="controls">
       <button id="startBtn" class="btn-primary">Start Recording</button>
       <button id="stopBtn" class="btn-secondary hidden">Stop Recording</button>
-      <button id="exportBtn" class="btn-secondary">Export to TXT</button>
+      <button id="exportDomainsBtn" class="btn-secondary">Export Domains</button>
+      <button id="exportIPsBtn" class="btn-secondary">Export IPs</button>
       <button id="clearBtn" class="btn-danger">Clear</button>
     </div>
 
     <div id="recordingStatus" class="recording-indicator hidden">
       <span class="recording-dot"></span>
       Recording network requests...
+    </div>
+
+    <div id="resolveProgress" class="resolve-progress hidden">
+      <div class="progress-text">
+        Resolving IPs: <span id="resolvedCount">0</span>/<span id="totalCount">0</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
     </div>
 
     <div class="stats">
@@ -190,6 +257,10 @@
         <h3>Unique Domains</h3>
         <div id="uniqueDomains" class="value">0</div>
       </div>
+      <div class="stat-card">
+        <h3>Resolved IPs</h3>
+        <div id="resolvedIPs" class="value">0</div>
+      </div>
     </div>
 
     <div class="domain-list">
@@ -200,6 +271,8 @@
     </div>
   </div>
 
+  <script src="ip-utils.js"></script>
+  <script src="dns-resolver.js"></script>
   <script src="panel.js"></script>
 </body>
 </html>
