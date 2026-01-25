@@ -1,0 +1,90 @@
+name: Publish Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версия для публикации (например, 1.2.3)'
+        required: true
+        type: string
+      publish_mode:
+        description: 'Режим публикации'
+        required: true
+        type: choice
+        options:
+          - draft
+          - publish
+        default: 'publish'
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    
+    if: github.actor == 'alesha-pro'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update version in manifest.json
+        run: |
+          jq --arg version "${{ github.event.inputs.version }}" '.version = $version' manifest.json > tmp.json
+          mv tmp.json manifest.json
+          cat manifest.json
+
+      - name: Create ZIP archive
+        run: |
+          zip -r extension-${{ github.event.inputs.version }}.zip . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x ".gitignore" \
+            -x "README.md" \
+            -x "*.md" \
+            -x "node_modules/*" \
+            -x ".DS_Store" \
+            -x "*.zip"
+          
+          echo "📦 Archive contents:"
+          unzip -l extension-${{ github.event.inputs.version }}.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-release
+          path: extension-${{ github.event.inputs.version }}.zip
+          retention-days: 30
+
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    
+    environment: production
+    
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-release
+
+      - name: Upload to Chrome Web Store
+        uses: mobilefirstllc/cws-publish@latest
+        with:
+          action: ${{ github.event.inputs.publish_mode }}
+          zip_file: extension-${{ github.event.inputs.version }}.zip
+          extension_id: ${{ secrets.EXTENSION_ID }}
+          client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+          client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          files: extension-${{ github.event.inputs.version }}.zip
+          body: |
+            🚀 Chrome Extension v${{ github.event.inputs.version }}
+            
+            Published to Chrome Web Store.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
