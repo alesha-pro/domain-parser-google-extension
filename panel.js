@@ -190,7 +190,7 @@
     elements.progressFill.style.width = `${percentage}%`;
   }
 
-  function exportDomainsToTxt() {
+  async function exportDomainsToTxt() {
     if (state.domains.size === 0) {
       alert('No domains to export. Start recording first.');
       return;
@@ -199,10 +199,10 @@
     const sortedDomains = Array.from(state.domains).sort();
     const content = sortedDomains.join('\n');
     
-    downloadFile(content, 'domains');
+    await downloadFile(content, 'domains');
   }
 
-  function exportIPsToTxt() {
+  async function exportIPsToTxt() {
     if (state.domainData.size === 0) {
       alert('No domains to export. Start recording first.');
       return;
@@ -231,22 +231,49 @@
       return;
     }
 
-    downloadFile(content, 'ip-subnets');
+    await downloadFile(content, 'ip-subnets');
   }
 
-  function downloadFile(content, prefix) {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-
+  async function downloadFile(content, prefix) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const filename = `${prefix}-${timestamp}.txt`;
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
+    
+    // Method 1: Try chrome.downloads API (most reliable for Vivaldi and all Chromium browsers)
+    if (chrome?.downloads && content.length < 2 * 1024 * 1024) {
+      try {
+        const dataUri = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+        await chrome.downloads.download({
+          url: dataUri,
+          filename: filename,
+          saveAs: false
+        });
+        console.log('Download started via chrome.downloads API');
+        return;
+      } catch (error) {
+        console.warn('chrome.downloads API failed, trying blob method:', error);
+      }
+    }
+    
+    // Method 2: Fallback to Blob URL (for Chrome and newer Vivaldi versions)
+    try {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      
+      // Append to DOM to ensure click works in all browsers
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Delay revocation for Vivaldi compatibility
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      console.log('Download started via blob URL');
+    } catch (error) {
+      console.error('All download methods failed:', error);
+      alert('Ошибка загрузки файла. Если вы используете Vivaldi, обновите браузер до версии 7.4+\n\nDownload failed. If you are using Vivaldi, please update to version 7.4+');
+    }
   }
 
   function clearAll() {

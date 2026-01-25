@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Domain Parser",
-  "version": "1.0.2",
-  "description": "Parse and export all domains with IP addresses and subnets from network requests. Analyze which external services any website connects to.",
+  "version": "1.0.3",
+  "description": "Parse and export all domains with IP addresses and subnets from network requests.",
   "devtools_page": "devtools.html",
-  "permissions": [],
+  "permissions": ["downloads"],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
