@@ -69,15 +69,15 @@ jobs:
         with:
           name: extension-release
 
-      - name: Upload to Chrome Web Store
-        uses: mobilefirstllc/cws-publish@latest
-        with:
-          action: ${{ github.event.inputs.publish_mode }}
-          zip_file: extension-${{ github.event.inputs.version }}.zip
-          extension_id: ${{ secrets.EXTENSION_ID }}
-          client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
-          client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          refresh_token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+      # - name: Upload to Chrome Web Store
+      #   uses: mobilefirstllc/cws-publish@latest
+      #   with:
+      #     action: ${{ github.event.inputs.publish_mode }}
+      #     zip_file: extension-${{ github.event.inputs.version }}.zip
+      #     extension_id: ${{ secrets.EXTENSION_ID }}
+      #     client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+      #     client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      #     refresh_token: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
