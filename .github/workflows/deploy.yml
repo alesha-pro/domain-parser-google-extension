@@ -16,6 +16,9 @@ on:
           - publish
         default: 'publish'
 
+permissions:
+  contents: write
+
 jobs:
   package:
     runs-on: ubuntu-latest
